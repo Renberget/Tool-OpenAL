@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MyForm.cpp">
+    <ClCompile Include="OpenAL.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="Framework\aldlist.cpp">
@@ -32,7 +32,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyForm.h">
+    <ClInclude Include="OpenAL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Framework\aldlist.h">
@@ -45,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Framework\LoadOAL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadOgg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
