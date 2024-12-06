@@ -3,6 +3,7 @@
 #include <Vorbis/vorbisfile.h>
 #include <stdio.h>
 #include <vector>
+#include <string>
 
 using namespace System::Diagnostics;
 
@@ -68,8 +69,10 @@ unsigned long decodeOgg(OggVorbis_File* psOggVorbisFile, char* pDecodeBuffer, un
 	return ulBytesDone;
 }
 
-void loadOgg(ALuint alBufferId, FILE* file)
+bool loadOgg(ALuint alBufferId, std::string filename)
 {
+	FILE* file = fopen(filename.data(), "rb");
+
 	ov_callbacks callbacks;
 	callbacks.read_func = ov_read_func;
 	callbacks.seek_func = ov_seek_func;
@@ -80,14 +83,14 @@ void loadOgg(ALuint alBufferId, FILE* file)
 	if (int error = ov_open_callbacks(file, &oggFile, NULL, 0, callbacks))
 	{
 		Debug::WriteLine("Could not open ogg with callbacks. Error " + error.ToString());
-		return;
+		return false;
 	}
 	
 	vorbis_info* info = ov_info(&oggFile, -1);
 	if (!info)
 	{
 		Debug::WriteLine("Could not retreive info from ogg");
-		return;
+		return false;
 	}
 	
 	unsigned long ulBufferSize;
@@ -128,7 +131,7 @@ void loadOgg(ALuint alBufferId, FILE* file)
 		ulBufferSize -= (ulBufferSize % 12);
 	}
 	else
-		return;
+		return false;
 	
 	std::vector<char> buffer(ulBufferSize);
 	unsigned int ulWrittenBytes;
@@ -136,11 +139,13 @@ void loadOgg(ALuint alBufferId, FILE* file)
 	do
 	{
 		buffer.resize(buffer.size() + ulBufferSize);
-		ulWrittenBytes = decodeOgg(&oggFile, buffer.data(), ulBufferSize, ulChannels);
+		ulWrittenBytes = decodeOgg(&oggFile, buffer.data() + ulTotalWrittenBytes, ulBufferSize, ulChannels);
 		ulTotalWrittenBytes += ulWrittenBytes;
 	} while (ulWrittenBytes);
-	Debug::WriteLine(ulTotalWrittenBytes);
+
 	alBufferData(alBufferId, ulFormat, buffer.data(), ulTotalWrittenBytes, ulFrequency);
 
 	ov_clear(&oggFile);
+	fclose(file);
+	return true;
 }
